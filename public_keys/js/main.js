@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const keyBox = document.createElement("div");
                 keyBox.className = "key-box";
 
+                // Add a name tag
+                const keyName = document.createElement("h3");
+                keyName.textContent = key.name;
+                keyName.className = "key-name";
+
                 const keyContent = document.createElement("pre");
                 fetch(key.path)
                     .then(response => response.text())
@@ -25,14 +30,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 copyButton.textContent = "Copy";
                 copyButton.addEventListener("click", () => {
                     navigator.clipboard.writeText(keyContent.textContent).then(() => {
-                        alert("Key copied to clipboard!");
                     }).catch(() => {
                         alert("Failed to copy the key.");
                     });
                 });
 
+                // Append elements to the box
+                keyBox.appendChild(keyName);
                 keyBox.appendChild(keyContent);
                 keyBox.appendChild(copyButton);
+
+                // Append the box to the container
                 keysContainer.appendChild(keyBox);
             });
         })

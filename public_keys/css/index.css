@@ -51,3 +51,10 @@ h1 {
 .copy-button:hover {
     background: #0056b3;
 }
+
+.key-name {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+    color: #007BFF;
+    font-weight: bold;
+}
