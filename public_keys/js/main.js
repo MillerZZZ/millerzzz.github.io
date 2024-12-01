@@ -7,13 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const keysContainer = document.getElementById("keys-container");
 
             data.public_keys.forEach(key => {
-                const keyBox = document.createElement("div");
-                keyBox.className = "key-box";
-
-                // Add a name tag
+                // Add a name tag before the box
                 const keyName = document.createElement("h3");
                 keyName.textContent = key.name;
                 keyName.className = "key-name";
+
+                // Create the box for the key
+                const keyBox = document.createElement("div");
+                keyBox.className = "key-box";
 
                 const keyContent = document.createElement("pre");
                 fetch(key.path)
@@ -35,12 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 });
 
-                // Append elements to the box
-                keyBox.appendChild(keyName);
+                // Append content to the box
                 keyBox.appendChild(keyContent);
                 keyBox.appendChild(copyButton);
 
-                // Append the box to the container
+                // Append the name tag and the box to the container
+                keysContainer.appendChild(keyName);
                 keysContainer.appendChild(keyBox);
             });
         })
