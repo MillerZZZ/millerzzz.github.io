@@ -1,0 +1,5 @@
+public_keys:
+  - name: SSH Public Key
+    path: static/id_rsa.pub
+  - name: GPG Public Key
+    path: static/public_key.asc
