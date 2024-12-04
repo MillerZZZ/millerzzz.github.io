@@ -1,5 +1,13 @@
 public_keys:
-  - name: SSH Public Key
+  - name: SSH Public Key (ED25519)
+    path: static/id_ed25519.pub
+  - name: SSH Public Key (ECDSA)
+    path: static/id_ecdsa.pub
+  - name: SSH Public Key (RSA w/4096 bits)
     path: static/id_rsa.pub
+  - name: SSH Public Key - Classic (RSA w/2048 bits)
+    path: static/id_rsa_classic.pub
+  - name: SSH Public Key (RSA w/3072 bits)
+    path: static/id_rsa_3072.pub
   - name: GPG Public Key
     path: static/public_key.asc
