@@ -5,9 +5,12 @@ public_keys:
     path: static/id_ecdsa.pub
   - name: SSH Public Key (RSA w/4096 bits)
     path: static/id_rsa.pub
+    notes: new, w/advance algorithm
   - name: SSH Public Key - Classic (RSA w/2048 bits)
     path: static/id_rsa_classic.pub
+    notes: old, mainly used (for remote servers)
   - name: SSH Public Key (RSA w/3072 bits)
     path: static/id_rsa_3072.pub
+    notes: less used
   - name: GPG Public Key
     path: static/public_key.asc
