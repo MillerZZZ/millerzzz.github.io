@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://millerzzz.github.io/vsbm</loc>
-    <lastmod>2024-12-01</lastmod>
+    <loc>https://millerzzz.github.io/vsbm/</loc>
+    <lastmod>2025-04-30</lastmod>
   </url>
   <url>
-    <loc>https://millerzzz.github.io/public_keys</loc>
-    <lastmod>2024-12-04</lastmod>
+    <loc>https://millerzzz.github.io/public_keys/</loc>
+    <lastmod>2025-04-30</lastmod>
+  </url>
+  <url>
+    <loc>https://millerzzz.github.io/CC-BY-SA-4.0/</loc>
+    <lastmod>2025-04-30</lastmod>
+  </url>
+  <url>
+    <loc>https://millerzzz.github.io/LICENSE/</loc>
+    <lastmod>2025-04-30</lastmod>
+  </url>
+  <url>
+    <loc>https://millerzzz.github.io/pwd/</loc>
+    <lastmod>2025-04-30</lastmod>
+  </url>
+  <url>
+    <loc>https://millerzzz.github.io/vsbm_inline/</loc>
+    <lastmod>2025-04-30</lastmod>
   </url>
 </urlset>
