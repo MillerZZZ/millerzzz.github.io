@@ -14,12 +14,13 @@
   For details, see the original repository: https://github.com/cznull/cznull.github.io.
 -->
 
-<html lang="en">
-<html translate="no">
+<!DOCTYPE html>
+<html lang="en" translate="no">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>volumeshader_bm</title>
     <style>
         body {
@@ -76,7 +77,7 @@
         <textarea name="" id="kernel" cols="30" rows="10"></textarea>
         <br />
         <button id="apply">APPLY</button>
-        <button id="cancle">CANCEL</button>
+        <button id="cancel">CANCEL</button>
     </div>
     <label id="fps">fps: 0</label>
     <script>
@@ -540,7 +541,7 @@
                 gly = gl.getUniformLocation(shaderProgram, 'y');
                 gllen = gl.getUniformLocation(shaderProgram, 'len');
             });
-            document.getElementById("cancle").addEventListener("click", function () {
+            document.getElementById("cancel").addEventListener("click", function () {
                 document.getElementById("kernel").value = KERNEL;
             });
         }
