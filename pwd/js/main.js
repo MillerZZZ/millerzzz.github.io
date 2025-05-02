@@ -37,12 +37,12 @@ const randPwd = () => {
             if (char == '*') {
                 let c = '';
                 let flag = true;
-                while (flag) {
+                do {
                     flag = false;
                     c = randLetter();
                     let j = 0;
                     while (++j < cnt && !(flag = pwd[index - j] == c));
-                }
+                } while (flag);
                 pwd[index] = c;
             }
         }
