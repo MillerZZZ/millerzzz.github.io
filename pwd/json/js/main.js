@@ -1,6 +1,20 @@
 'use strict';
 
-let rand = () => window.crypto.getRandomValues(new Uint32Array(1))[0] % 100000;
+let rand = (() => {
+    const buffer = new Uint32Array(1);
+    const targetRange = 100000;
+    const rangeSize = 0x100000000;
+    const maxValidValue = Math.floor(rangeSize / targetRange) * targetRange;
+
+    return () => {
+      let randomVal;
+      do {
+        window.crypto.getRandomValues(buffer);
+        randomVal = buffer[0];
+      } while (randomVal >= maxValidValue);
+      return randomVal % targetRange;
+    };
+})();
 
 if (!window.crypto || !window.crypto.getRandomValues) {
     console.warn('Crypto API not supported, using Math.random() instead.');
