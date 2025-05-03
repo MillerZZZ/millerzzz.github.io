@@ -48,7 +48,7 @@ const randPwd = () => {
         }
     });
     return pwd.join('').slice(1);
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const genedPwd = randPwd();
