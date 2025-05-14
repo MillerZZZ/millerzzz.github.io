@@ -1,0 +1,3 @@
+[submodule "pwd/js/random-utils"]
+	path = pwd/js/random-utils
+	url = https://github.com/MillerZZZ/random-utils-js.git
