@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Schedule</title>
+
+<style>
+:root {
+    --line: #e2e2e5;
+    --text: #29292d;
+    --muted: #77777d;
+    --course: #ededee;
+    --course-hover: #e3e3e5;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--white);
+    color: var(--text);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "Helvetica Neue",
+        "PingFang SC",
+        "Microsoft YaHei",
+        Arial,
+        sans-serif;
+}
+
+.wrapper {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+}
+
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 650;
+    letter-spacing: 0.1px;
+}
+
+.subtitle {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+button,
+select {
+    min-height: 40px;
+    padding: 7px 12px;
+
+    border: 1px solid #d6d6da;
+    border-radius: 0;
+
+    background: white;
+    color: #333;
+
+    font: inherit;
+    cursor: pointer;
+}
+
+button:hover,
+select:hover {
+    background: #f5f5f6;
+}
+
+.calendar {
+    display: grid;
+
+    grid-template-columns:
+        64px
+        repeat(7, minmax(120px, 1fr));
+
+    border-left: 1px solid var(--line);
+    border-top: 1px solid var(--line);
+
+    overflow: hidden;
+}
+
+
+
+.corner {
+    height: 66px;
+
+    border-right: 1px solid var(--line);
+}
+
+
+
+.day-header {
+    height: 66px;
+
+    padding-top: 12px;
+
+    text-align: center;
+
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+
+    background: white;
+}
+
+.day-header .english {
+    font-size: 16px;
+    font-weight: 560;
+}
+
+.day-header .date {
+    margin-top: 5px;
+
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.time-column {
+    position: relative;
+
+    height: 716px;
+
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.time-label {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    transform: translateY(-50%);
+
+    padding-right: 8px;
+
+    text-align: right;
+
+    font-size: 12px;
+    color: #777;
+}
+
+.day-column {
+    position: relative;
+
+    height: 716px;
+
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+
+    background: white;
+}
+
+
+
+.hour-line {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    height: 1px;
+
+    background: #ededee;
+
+    pointer-events: none;
+}
+
+.course {
+    position: absolute;
+
+    left: 7px;
+    right: 7px;
+
+    padding: 9px 10px;
+
+    border-radius: 0;
+
+    background: var(--course);
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    z-index: 5;
+
+    transition:
+        background 0.12s ease,
+        transform 0.12s ease;
+}
+
+.course:hover {
+    background: var(--course-hover);
+    transform: translateY(-1px);
+}
+
+.course.current-course {
+    background: #d8d8dc;
+}
+
+.course.current-course .course-name,
+.course.current-course .course-room,
+.course.current-course .course-time {
+    font-weight: 700;
+}
+
+.current-time-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #d64545;
+    z-index: 8;
+    pointer-events: none;
+}
+
+.current-time-line::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d64545;
+}
+
+.current-time-label {
+    position: absolute;
+    right: calc(100% + 12px);
+    transform: translateY(-50%);
+    padding: 0;
+    background: transparent;
+    color: #d64545;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    z-index: 9;
+    pointer-events: none;
+}
+
+.course-name {
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.25;
+}
+
+.course-room {
+    margin-top: 5px;
+
+    font-size: 12px;
+    line-height: 1.3;
+
+    color: #55555a;
+}
+
+.course-time {
+    margin-top: 3px;
+
+    font-size: 11px;
+    line-height: 1.3;
+
+    color: #77777c;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    padding-top: 13px;
+
+    font-size: 12px;
+    color: #777;
+}
+
+.modal-backdrop {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 100;
+
+    background: rgba(0, 0, 0, 0.22);
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.modal-backdrop.show {
+    display: flex;
+}
+
+.modal {
+    width: min(460px, 100%);
+
+    max-height: calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    background: white;
+
+    border: 1px solid #dcdcdf;
+
+    border-radius: 0;
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+
+    padding: 24px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+
+    padding: 0;
+
+    border: 1px solid #ddd;
+
+    font-size: 20px;
+    line-height: 1;
+}
+
+.info-row {
+    display: grid;
+
+    grid-template-columns: 90px 1fr;
+
+    min-height: 38px;
+
+    border-top: 1px solid #eeeeef;
+
+    align-items: center;
+}
+
+.info-label {
+    color: #777;
+    font-size: 13px;
+}
+
+.info-value {
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+
+    .wrapper {
+        padding: 18px 10px 30px;
+    }
+
+    .header {
+        flex-direction: column;
+    }
+
+    .calendar {
+        overflow-x: auto;
+
+        grid-template-columns:
+            48px
+            repeat(7, 112px);
+    }
+
+    .time-column {
+        min-width: 48px;
+    }
+
+    .corner {
+        min-width: 48px;
+    }
+
+    .title {
+        font-size: 19px;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="wrapper">
+
+    <div class="header">
+
+        <div>
+            <div class="title">
+                Pharmaceutical · Schedule
+            </div>
+
+            <div class="subtitle">
+                First semester
+                · 2026.08.24–2027.01.10
+            </div>
+        </div>
+
+
+        <div class="controls">
+
+            <button id="previousWeek" type="button">
+                ‹
+            </button>
+
+            <select id="weekSelector">
+            </select>
+
+            <button id="nextWeek" type="button">
+                ›
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="calendar">
+
+        <div class="corner"></div>
+
+        <div class="day-header" data-day="0">
+            <div class="english">Sun</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="day-header" data-day="1">
+            <div class="english">Mon</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="day-header" data-day="2">
+            <div class="english">Tue</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="day-header" data-day="3">
+            <div class="english">Wed</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="day-header" data-day="4">
+            <div class="english">Thu</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="day-header" data-day="5">
+            <div class="english">Fri</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="day-header" data-day="6">
+            <div class="english">Sat</div>
+            <div class="date"></div>
+        </div>
+
+        <div class="time-column" id="timeColumn"></div>
+
+        <div class="day-column" data-day="0"></div>
+        <div class="day-column" data-day="1"></div>
+        <div class="day-column" data-day="2"></div>
+        <div class="day-column" data-day="3"></div>
+        <div class="day-column" data-day="4"></div>
+        <div class="day-column" data-day="5"></div>
+        <div class="day-column" data-day="6"></div>
+
+    </div>
+
+
+    <div class="legend">
+
+        <span>
+            
+        </span>
+
+    </div>
+
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div class="modal-title" id="modalTitle">
+                课程
+            </div>
+
+            <button
+                class="modal-close"
+                id="modalClose"
+                type="button"
+                aria-label="关闭"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="modalContent"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const FIRST_WEEK = 1;
+const LAST_WEEK = 20;
+
+let currentWeek = 8;
+
+const semesterStart =
+    new Date(Date.UTC(2026, 7, 24));
+
+const periodStart = {
+
+    1: "08:30",
+    2: "09:15",
+
+    3: "10:15",
+    4: "11:00",
+
+    5: "13:40",
+    6: "14:25",
+
+    7: "15:15",
+    8: "16:00",
+
+    9: "17:30",
+    10: "18:15"
+};
+
+
+const periodEnd = {
+
+    1: "09:10",
+    2: "09:55",
+
+    3: "10:55",
+    4: "11:40",
+
+    5: "14:20",
+    6: "15:05",
+
+    7: "15:55",
+    8: "16:40",
+
+    9: "18:10",
+    10: "18:55"
+};
+
+const periodNames = {
+
+    1: "1",
+    2: "2",
+    3: "3",
+    4: "4",
+    5: "5",
+    6: "6",
+    7: "7",
+    8: "8",
+    9: "9",
+    10: "10"
+
+};
+
+function timeToMinutes(time) {
+
+    const parts = time.split(":");
+
+    return (
+        Number(parts[0]) * 60 +
+        Number(parts[1])
+    );
+
+}
+
+const AXIS_START =
+    8 * 60;
+
+const AXIS_END =
+    19 * 60 + 30;
+
+const AXIS_LENGTH =
+    AXIS_END - AXIS_START;
+
+const dayCN = [
+
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+
+];
+
+const courses = [
+
+    
+
+    {
+        day: 1,
+        startPeriod: 1,
+        endPeriod: 2,
+        name: "IELTS · Listening",
+        weeks: [6,8,9,10,11,12,13,14,15,16,17,18],
+        room: "207 room",
+        className: "C2"
+    },
+
+    {
+        day: 1,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Speaking · IS",
+        weeks: [8,9,10,11,12,13,14,15],
+        room: "406 room",
+        className: "C2"
+    },
+
+    {
+        day: 1,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Speaking · EX",
+        weeks: [16,17,18],
+        room: "406 room",
+        className: "C2"
+    },
+
+    {
+        day: 1,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS",
+        weeks: [6],
+        room: "403 room",
+        className: "60"
+    },
+
+    {
+        day: 1,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "Ideological & Moral",
+        weeks: [8,9,10,11,12,13],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 1,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "Modern History",
+        weeks: [14,15,16,17],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 1,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "Sports",
+        weeks: [9,10,11],
+        room: "",
+        className: "All"
+    },
+
+    {
+        day: 1,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "Situation & Policy",
+        weeks: [12,13],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 1,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "Psychology Health",
+        weeks: [14,15,16,17],
+        room: "403 room",
+        className: "All"
+    },
+
+
+    
+
+    {
+        day: 2,
+        startPeriod: 1,
+        endPeriod: 2,
+        name: "Elective Course",
+        weeks: [9,10,11,12,13,14,15,16],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 2,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "Sports",
+        weeks: [9,10,11],
+        room: "",
+        className: "All"
+    },
+
+    {
+        day: 2,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "Labour Edu",
+        weeks: [12,13,14,15],
+        room: "403 room",
+        className: "All"
+    },
+
+    {
+        day: 2,
+        startPeriod: 1,
+        endPeriod: 4,
+        name: "Anatomy Experiment",
+        weeks: [17],
+        room: "403 room",
+        className: "60-61Class"
+    },
+
+    {
+        day: 2,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "IELTS · Reading",
+        weeks: [6,8,9,10,11,12,13,14,15,16,17,18],
+        room: "403 room",
+        className: "C2"
+    },
+
+    {
+        day: 2,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "IELTS · Composition",
+        weeks: [6,8,9,10,11,12,13,14,15,16,17,18],
+        room: "201 room",
+        className: "C2"
+    },
+
+
+    
+
+    {
+        day: 3,
+        startPeriod: 1,
+        endPeriod: 2,
+        name: "IELTS · Reading",
+        weeks: [6,8,9,10,11,12,13,14,15,16,17,18],
+        room: "403 room",
+        className: "C2"
+    },
+
+    {
+        day: 3,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Composition",
+        weeks: [6,8,9,10,11,12,13,14,15,16,17,18],
+        room: "201 room",
+        className: "C2"
+    },
+
+    {
+        day: 3,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "Anatomy",
+        weeks: [8,9,10,11,12,13,14,15,16,17],
+        room: "403 room",
+        className: "All"
+    },
+
+    {
+        day: 3,
+        startPeriod: 7,
+        endPeriod: 10,
+        name: "Ideological & Moral",
+        endTime: "17:55",
+        weeks: [8,9,10,11,12],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 3,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "Modern History",
+        weeks: [13,14,15,16,17],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 3,
+        startPeriod: 5,
+        endPeriod: 8,
+        name: "Anatomy",
+        weeks: [18],
+        room: "403 room",
+        className: "All"
+    },
+
+
+    
+
+    {
+        day: 4,
+        startPeriod: 1,
+        endPeriod: 2,
+        name: "IELTS · Composition",
+        weeks: [7,8,9,10,11,12,13,14,15,16,17,18],
+        room: "201 room",
+        className: "C2"
+    },
+
+    {
+        day: 4,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Reading",
+        weeks: [7,8,9,10,11,12,13,14,15,16,17,18],
+        room: "403 room",
+        className: "C2"
+    },
+
+    {
+        day: 4,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "IELTS · Listening",
+        weeks: [7,8,9,10,11,12,13,14,15,16,17,18],
+        room: "207 room",
+        className: "C2"
+    },
+
+    {
+        day: 4,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "IELTS · Speaking · SD",
+        weeks: [7,8,9,10,11,12,13,14,15,16,17,18],
+        room: "407 room",
+        className: "C2"
+    },
+
+
+    
+
+    {
+        day: 5,
+        startPeriod: 1,
+        endPeriod: 2,
+        name: "IELTS · Listening",
+        weeks: [7,8,9,10,11,12,13,14,15,16,17,18],
+        room: "207 room",
+        className: "C2"
+    },
+
+    {
+        day: 5,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Speaking · IS",
+        weeks: [7,9,11,13,15],
+        room: "406 room",
+        className: "C2"
+    },
+
+    {
+        day: 5,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Speaking · SD",
+        weeks: [8,10,12,14,16,18],
+        room: "407 room",
+        className: "C2"
+    },
+
+    {
+        day: 5,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "IELTS · Speaking · EX",
+        weeks: [17],
+        room: "406 room",
+        className: "C2"
+    },
+
+    {
+        day: 5,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "IELTS · Speaking · IS",
+        weeks: [11],
+        room: "406 room",
+        className: "C2"
+    },
+
+    {
+        day: 5,
+        startPeriod: 5,
+        endPeriod: 6,
+        name: "Modern History",
+        weeks: [13,14,15,16],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 5,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "National Security Edu",
+        weeks: [8,9,10,11,12,13,14,15],
+        room: "403 room",
+        className: "60-62Class"
+    },
+
+    {
+        day: 1,
+        startPeriod: 7,
+        endPeriod: 8,
+        name: "Sports Theory",
+        weeks: [8],
+        room: "Science & Arts Center · 207",
+        className: "60–63"
+    },
+
+    {
+        day: 2,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "Sports Theory",
+        weeks: [8],
+        room: "Science & Arts Center · 207",
+        className: "60–63"
+    },
+
+    {
+        day: 0,
+        startPeriod: 1,
+        endPeriod: 4,
+        name: "Laboratory Safety Training",
+        weeks: [9],
+        room: "Basic Medical Laboratory Teaching Center · West Building A209",
+        className: "60–61"
+    },
+
+    {
+        day: 0,
+        startPeriod: 5,
+        endPeriod: 8,
+        name: "Psychological Practice",
+        weeks: [12],
+        room: "Student Psychological Development Center",
+        className: "60–61"
+    },
+
+    {
+        day: 2,
+        startPeriod: 3,
+        endPeriod: 4,
+        name: "First Aid Training",
+        weeks: [16],
+        room: "Clinical Skills Practical Teaching Center · 402",
+        className: "60"
+    },
+
+    {
+        day: 2,
+        startPeriod: 9,
+        endPeriod: 10,
+        name: "Psychological Quality Development Training",
+        weeks: [14],
+        room: "Gymnasium · Basketball Court",
+        className: "60–61"
+    }
+
+];
+
+
+
+function getWeekStart(week) {
+
+    const date =
+        new Date(semesterStart);
+
+    date.setUTCDate(
+        date.getUTCDate() +
+        (week - 1) * 7 - 1
+    );
+
+    return date;
+
+}
+
+
+function formatDate(date) {
+
+    return (
+        (date.getUTCMonth() + 1) +
+        "/" +
+        date.getUTCDate()
+    );
+
+}
+
+
+
+
+function getTop(period) {
+
+    const start =
+        timeToMinutes(periodStart[period]);
+
+    return (
+        (start - AXIS_START) /
+        AXIS_LENGTH *
+        100
+    );
+
+}
+
+
+function getHeight(startPeriod, endPeriod, endTime) {
+
+    const start =
+        timeToMinutes(
+            periodStart[startPeriod]
+        );
+
+    const end =
+        timeToMinutes(
+            endTime || periodEnd[endPeriod]
+        );
+
+    return (
+        (end - start) /
+        AXIS_LENGTH *
+        100
+    );
+
+}
+
+function splitLunch(course) {
+
+    const result = [];
+
+
+    if (
+        course.startPeriod <= 4 &&
+        course.endPeriod >= 1
+    ) {
+
+        result.push({
+
+            startPeriod:
+                course.startPeriod,
+
+            endPeriod:
+                Math.min(
+                    course.endPeriod,
+                    4
+                )
+
+        });
+
+    }
+
+
+    if (
+        course.startPeriod <= 10 &&
+        course.endPeriod >= 5
+    ) {
+
+        result.push({
+
+            startPeriod:
+                Math.max(
+                    course.startPeriod,
+                    5
+                ),
+
+            endPeriod:
+                course.endPeriod
+
+        });
+
+    }
+
+
+    return result;
+
+}
+
+
+
+
+const weekSelector =
+    document.getElementById(
+        "weekSelector"
+    );
+
+
+for (
+    let week = FIRST_WEEK;
+    week <= LAST_WEEK;
+    week++
+) {
+
+    const option =
+        document.createElement("option");
+
+    option.value = week;
+
+    option.textContent =
+        "Week" + week;
+
+    weekSelector.appendChild(option);
+
+}
+
+
+
+
+function renderTimeLabels() {
+
+    const column =
+        document.getElementById(
+            "timeColumn"
+        );
+
+    column.innerHTML = "";
+
+
+    
+
+    const hours = [
+        8,9,10,11,
+        12,13,14,15,
+        16,17,18,19
+    ];
+
+
+    hours.forEach(hour => {
+
+        const label =
+            document.createElement(
+                "div"
+            );
+
+        label.className =
+            "time-label";
+
+
+        const position =
+            (
+                (hour * 60 - AXIS_START) /
+                AXIS_LENGTH
+            ) * 100;
+
+
+        label.style.top =
+            position + "%";
+
+
+        if (hour < 12) {
+
+            label.textContent =
+                hour + " AM";
+
+        } else if (hour === 12) {
+
+            label.textContent =
+                "12 PM";
+
+        } else {
+
+            label.textContent =
+                (hour - 12) + " PM";
+
+        }
+
+
+        column.appendChild(label);
+
+    });
+
+}
+
+
+
+
+function renderGridLines() {
+
+    document
+        .querySelectorAll(".day-column")
+        .forEach(column => {
+
+            column.innerHTML = "";
+
+
+            
+
+            const hours = [
+                9,10,11,
+                12,13,14,
+                15,16,17,18,19
+            ];
+
+
+            hours.forEach(hour => {
+
+                const line =
+                    document.createElement(
+                        "div"
+                    );
+
+                line.className =
+                    "hour-line";
+
+
+                line.style.top =
+                    (
+                        (hour * 60 - AXIS_START) /
+                        AXIS_LENGTH *
+                        100
+                    ) + "%";
+
+
+                column.appendChild(line);
+
+            });
+
+        });
+
+}
+
+
+
+
+function renderCourses(week) {
+
+    document
+        .querySelectorAll(".day-column")
+        .forEach(column => {
+
+            column
+                .querySelectorAll(".course")
+                .forEach(course => {
+                    course.remove();
+                });
+
+        });
+
+
+    courses
+        .filter(course =>
+            course.weeks.includes(week)
+        )
+        .forEach(course => {
+
+
+            const dayColumn =
+                document.querySelector(
+                    `.day-column[data-day="${course.day}"]`
+                );
+
+
+            if (!dayColumn) {
+                return;
+            }
+
+            const segments =
+                splitLunch(course);
+
+
+            segments.forEach(segment => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+                card.className =
+                    "course";
+
+
+                const top =
+                    getTop(
+                        segment.startPeriod
+                    );
+
+
+                const height =
+                    getHeight(
+                        segment.startPeriod,
+                        segment.endPeriod,
+                        course.endTime
+                    );
+
+
+                card.style.top =
+                    top + "%";
+
+                card.style.height =
+                    height + "%";
+
+                const startTime =
+                    periodStart[
+                        segment.startPeriod
+                    ];
+
+                const endTime =
+                    course.endTime || periodEnd[
+                        segment.endPeriod
+                    ];
+
+
+                card.innerHTML = `
+
+                    <div class="course-name">
+                        ${course.name}
+                    </div>
+
+                    <div class="course-room">
+                        ${course.room}
+                    </div>
+
+                    <div class="course-time">
+                        ${startTime} – ${endTime}
+                    </div>
+
+                `;
+
+                card.addEventListener(
+                    "click",
+                    () => {
+
+                        openCourseModal(
+                            course,
+                            segment,
+                            week
+                        );
+
+                    }
+                );
+
+
+                dayColumn.appendChild(card);
+
+            });
+
+        });
+
+}
+
+
+
+
+function getCurrentWeek(now) {
+
+    const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+
+    const start = new Date(
+        semesterStart.getUTCFullYear(),
+        semesterStart.getUTCMonth(),
+        semesterStart.getUTCDate() - 1
+    );
+
+    const dayDifference =
+        Math.floor(
+            (today - start) /
+            (24 * 60 * 60 * 1000)
+        );
+
+    return Math.floor(dayDifference / 7) + 1;
+
+}
+
+
+function renderCurrentTime() {
+
+    document
+        .querySelectorAll(
+            ".current-time-line, .current-time-label"
+        )
+        .forEach(marker => marker.remove());
+
+    document
+        .querySelectorAll(".current-course")
+        .forEach(course => {
+            course.classList.remove(
+                "current-course"
+            );
+        });
+
+    const now = new Date();
+    const week = getCurrentWeek(now);
+    const minutes =
+        now.getHours() * 60 +
+        now.getMinutes() +
+        now.getSeconds() / 60;
+
+    if (
+        week < FIRST_WEEK ||
+        week > LAST_WEEK ||
+        currentWeek !== week ||
+        minutes < AXIS_START ||
+        minutes > AXIS_END
+    ) {
+        return;
+    }
+
+    const day = now.getDay();
+    const position =
+        (minutes - AXIS_START) /
+        AXIS_LENGTH * 100;
+
+    const dayColumn =
+        document.querySelector(
+            `.day-column[data-day="${day}"]`
+        );
+
+    if (!dayColumn) {
+        return;
+    }
+
+    const line =
+        document.createElement("div");
+
+    line.className = "current-time-line";
+    line.style.top = position + "%";
+    dayColumn.appendChild(line);
+
+    const label =
+        document.createElement("div");
+
+    label.className = "current-time-label";
+    label.style.top = position + "%";
+    label.textContent =
+        String(now.getHours()).padStart(2, "0") +
+        ":" +
+        String(now.getMinutes()).padStart(2, "0");
+
+    dayColumn.appendChild(label);
+
+    courses
+        .filter(course =>
+            course.day === day &&
+            course.weeks.includes(week) &&
+            minutes >= timeToMinutes(
+                periodStart[course.startPeriod]
+            ) &&
+            minutes <= timeToMinutes(
+                course.endTime || periodEnd[course.endPeriod]
+            )
+        )
+        .forEach(course => {
+
+            dayColumn
+                .querySelectorAll(".course")
+                .forEach(card => {
+
+                    const top = parseFloat(
+                        card.style.top
+                    );
+
+                    const height = parseFloat(
+                        card.style.height
+                    );
+
+                    if (
+                        position >= top &&
+                        position <= top + height
+                    ) {
+                        card.classList.add(
+                            "current-course"
+                        );
+                    }
+
+                });
+
+        });
+
+}
+
+
+
+
+function renderDates(week) {
+
+    const start =
+        getWeekStart(week);
+
+
+    document
+        .querySelectorAll(".day-header")
+        .forEach(header => {
+
+            const day =
+                Number(
+                    header.dataset.day
+                );
+
+
+            const date =
+                new Date(start);
+
+
+            date.setUTCDate(
+                date.getUTCDate() + day
+            );
+
+
+            header
+                .querySelector(".date")
+                .textContent =
+                formatDate(date) +
+                " · " +
+                dayCN[day];
+
+        });
+
+}
+
+
+
+
+function render(week) {
+
+    currentWeek = week;
+
+    weekSelector.value =
+        String(week);
+
+    renderTimeLabels();
+
+    renderGridLines();
+
+    renderDates(week);
+
+    renderCourses(week);
+
+    renderCurrentTime();
+
+}
+
+
+
+
+document
+    .getElementById("previousWeek")
+    .addEventListener(
+        "click",
+        () => {
+
+            if (
+                currentWeek > FIRST_WEEK
+            ) {
+
+                render(
+                    currentWeek - 1
+                );
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById("nextWeek")
+    .addEventListener(
+        "click",
+        () => {
+
+            if (
+                currentWeek < LAST_WEEK
+            ) {
+
+                render(
+                    currentWeek + 1
+                );
+
+            }
+
+        }
+    );
+
+
+weekSelector.addEventListener(
+    "change",
+    () => {
+
+        render(
+            Number(
+                weekSelector.value
+            )
+        );
+
+    }
+);
+
+
+
+
+const modalBackdrop =
+    document.getElementById(
+        "modalBackdrop"
+    );
+
+const modalTitle =
+    document.getElementById(
+        "modalTitle"
+    );
+
+const modalContent =
+    document.getElementById(
+        "modalContent"
+    );
+
+
+function openCourseModal(
+    course,
+    segment,
+    week
+) {
+
+    const weekStart =
+        getWeekStart(week);
+
+
+    const date =
+        new Date(weekStart);
+
+
+    date.setUTCDate(
+        date.getUTCDate() +
+        course.day
+    );
+
+
+    const startTime =
+        periodStart[
+            segment.startPeriod
+        ];
+
+    const endTime =
+        course.endTime || periodEnd[
+            segment.endPeriod
+        ];
+
+
+    const periodText =
+        segment.startPeriod ===
+        segment.endPeriod
+
+        ? periodNames[
+            segment.startPeriod
+        ]
+
+        : (
+            periodNames[
+                segment.startPeriod
+            ] +
+            "–" +
+            periodNames[
+                segment.endPeriod
+            ]
+        );
+
+
+    modalTitle.textContent =
+        course.name;
+
+
+    modalContent.innerHTML = `
+
+        <div class="info-row">
+            <div class="info-label">
+                Name
+            </div>
+            <div class="info-value">
+                ${course.name}
+            </div>
+        </div>
+
+
+        <div class="info-row">
+            <div class="info-label">
+                Week
+            </div>
+            <div class="info-value">
+                Week${week}
+            </div>
+        </div>
+
+
+        <div class="info-row">
+            <div class="info-label">
+                Date
+            </div>
+            <div class="info-value">
+                ${date.getUTCFullYear()}-${String(
+                    date.getUTCMonth() + 1
+                ).padStart(2, "0")}-${String(
+                    date.getUTCDate()
+                ).padStart(2, "0")}
+                ·
+                ${dayCN[course.day]}
+            </div>
+        </div>
+
+
+        <div class="info-row">
+            <div class="info-label">
+                Section
+            </div>
+            <div class="info-value">
+                ${periodText}
+            </div>
+        </div>
+
+
+        <div class="info-row">
+            <div class="info-label">
+                Time
+            </div>
+            <div class="info-value">
+                ${startTime} – ${endTime}
+            </div>
+        </div>
+
+
+        <div class="info-row">
+            <div class="info-label">
+                Location
+            </div>
+            <div class="info-value">
+                ${course.room}
+            </div>
+        </div>
+
+
+        <div class="info-row">
+            <div class="info-label">
+                Class
+            </div>
+            <div class="info-value">
+                ${course.className}
+            </div>
+        </div>
+
+    `;
+
+
+    modalBackdrop.classList.add(
+        "show"
+    );
+
+}
+
+
+
+
+function closeModal() {
+
+    modalBackdrop.classList.remove(
+        "show"
+    );
+
+}
+
+
+document
+    .getElementById("modalClose")
+    .addEventListener(
+        "click",
+        closeModal
+    );
+
+
+modalBackdrop.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            modalBackdrop
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+
+
+const initialWeek =
+    getCurrentWeek(new Date());
+
+render(
+    initialWeek >= FIRST_WEEK &&
+    initialWeek <= LAST_WEEK
+        ? initialWeek
+        : currentWeek
+);
+
+setInterval(
+    renderCurrentTime,
+    60 * 1000
+);
+
+</script>
+
+</body>
+</html>
